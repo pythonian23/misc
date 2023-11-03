@@ -1,0 +1,82 @@
+import pygame
+import sys
+import math
+import random
+
+color = [255, 255, 0]
+index = 0
+delta = 1
+adding = False
+
+invert = lambda c: [255-c[0], 255-c[1], 255-c[2]]
+
+x = 10
+y = 10
+dx = 1
+dy = 1
+v = 5
+da = 0.1
+a = math.pi/4
+newa = lambda: math.pi/2 * random.random()
+
+stype = 0
+sfuncs = [
+    pygame.draw.rect,
+    pygame.draw.ellipse,
+]
+
+pygame.init()
+
+screen = pygame.display.set_mode((720, 480))
+pygame.display.set_caption("Pygame <3 :3")
+
+halt = False
+while not halt:
+    for event in pygame.event.get():
+        halt = (event.type == pygame.QUIT)
+        if event.type == pygame.KEYDOWN:
+            stype = (stype+1)%len(sfuncs)
+
+    if adding:
+        color[index] += delta
+        if color[index] > 255:
+            color[index] = 255
+            index = random.randint(0, 2)
+            adding = (random.getrandbits(1) == 1)
+    else:
+        color[index] -= delta
+        if color[index] < 0:
+            color[index] = 0
+            index = random.randint(0, 2)
+            adding = (random.getrandbits(1) == 1)
+    # screen.fill(color)
+
+    a += da
+    x += dx * math.cos(a)
+    y += dy * math.sin(a)
+    if x < 0:
+        x = abs(x)
+        dx = 1
+        da = (0.005 * (random.random() - 0.5))
+        a = newa()
+    elif x + 50 > 720:
+        x = 2*(720-50) - x
+        dx = -1
+        da = (0.005 * (random.random() - 0.5))
+        a = newa()
+    if y < 0:
+        y = abs(y)
+        dy = 1
+        da = (0.005 * (random.random() - 0.5))
+        a = newa()
+    elif y + 50 > 480:
+        y = 2*(480-50) - y
+        dy = -1
+        da = (0.005 * (random.random() - 0.5))
+        a = newa()
+    sfuncs[stype](screen, invert(color), (x, y, 50, 50), 5)
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
